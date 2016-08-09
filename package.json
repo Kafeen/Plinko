@@ -1,0 +1,22 @@
+{
+  "name": "plinko",
+  "version": "0.0.1",
+  "description": "Plinko game",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kafeen/Plinko.git"
+  },
+  "author": "matthew.knowles",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kafeen/Plinko/issues"
+  },
+  "homepage": "https://github.com/Kafeen/Plinko#readme",
+  "devDependencies": {
+    "electron-prebuilt": "^1.3.2"
+  }
+}
