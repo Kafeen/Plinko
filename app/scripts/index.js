@@ -1,7 +1,5 @@
-function boot() {  
-    angular.bootstrap(document, ['app'], {
-        strictDi: true
-    });
+function boot() {
+
 }
 
-document.addEventListener('DOMContentLoaded', boot);  
+document.addEventListener('DOMContentLoaded', boot);

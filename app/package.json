@@ -1,0 +1,7 @@
+{
+    "name":"plinko",
+    "description": "Decide who makes the coffee",
+    "version": "0.0.1",
+    "author": "Matthew Knowles <mknowles_uk@yahoo.com>",
+    "main": "main.js"
+}

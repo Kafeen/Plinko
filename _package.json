@@ -1,0 +1,30 @@
+{
+  "name": "plinko",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "start": "electron ./app --enable-logging",
+    "dev": "NODE_ENV='development' npm run start",
+    "dist": "build -mwl --x64 --ia32",
+    "build": "electron-packager . --out=dist --app-version=$npm_package_version --prune --asar --overwrite --all"
+  },
+  "author": "",
+  "license": "ISC",
+  "build": {
+    "appId": "matthew.knowles.plinko",
+    "app-catagory-type": "public.app-category.games",
+    "dmg": {
+      "title": "Plinko"
+    },
+    "win": {
+      "icoUrl": "http://www.iconarchive.com/download/i49279/martin-berube/food/coffee.ico"
+    }
+  },
+  "devDependencies": {
+    "electron-builder": "^5.25.1",
+    "electron-packager": "^7.5.1",
+    "electron-prebuilt": "^1.3.3"
+  }
+}
