@@ -6,8 +6,6 @@ angular.module('plinko-app')
 }])
 .directive('pixi', function ($parse) {
   return {
-    //  template: 'Hello Pixi',
-    // template: '<canvas></canvas>',
     controller: function postLink($scope, $element, $attrs) {
         console.log('CONTROLLER', $scope, $element, $attrs);
         var canvas = $element[0];
@@ -17,11 +15,22 @@ angular.module('plinko-app')
         canvas.width  = parent.offsetWidth;
         canvas.height = parent.offsetHeight;
 
-        var renderer = PIXI.autoDetectRenderer(canvas.width, canvas.height,{backgroundColor : 0xff00ff, view : canvas});
-
+        var renderer = PIXI.autoDetectRenderer(canvas.width, canvas.height,{backgroundColor : 0x9EDDE7, view : canvas});
         var stage = new PIXI.Container();
 
-        renderer.render(stage);
+        var farTexture = PIXI.Texture.fromImage("assets/background/cloud1.png");
+        var far = new PIXI.Sprite(farTexture);
+        stage.addChild(far);
+
+        console.log(farTexture);
+
+        var update = function update() {
+          renderer.render(stage);
+
+          requestAnimationFrame(update);
+        }
+
+        requestAnimationFrame(update);                
     }
   };
 });
