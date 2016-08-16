@@ -15,7 +15,9 @@ app.on('ready', () => {
         name: 'Plinko',
         width: 1280,
         height: 720,
-        toolbar: false
+        toolbar: false,
+        resizable: false,
+        fullscreen: false
     });
 
     mainWindow.loadURL(path.join('file://', __dirname, '/app/index.html'));

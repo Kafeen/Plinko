@@ -16,6 +16,8 @@
   ],
   "dependencies": {
     "angular": "^1.5.8",
-    "angular-material": "^1.0.9"
+    "angular-material": "^1.0.9",
+    "pixi.js": "pixi#^3.0.11",
+    "livereload-js": "livereload#^2.2.1"
   }
 }

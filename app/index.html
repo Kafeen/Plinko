@@ -11,11 +11,15 @@
     <script type='text/javascript' src='../bower_components/angular-animate/angular-animate.js'></script>
     <script type='text/javascript' src='../bower_components/angular-material/angular-material.js'></script>
 
+    <script type='text/javascript' src="../bower_components/pixi.js/bin/pixi.js"></script>
+
     <script type='text/javascript' src='scripts/app.js'></script>
+    <script type='text/javascript' src="scripts/directives/pixi.js"></script>
   </head>
   <body layout="column" ng-controller="plinko-controller">
     <div flex layout="row">
       <md-content flex id="game" class="md-whiteframe-z2">
+        <canvas pixi></canvas>
       </md-content>
       <md-content flex="20" id="userlist" class="md-whiteframe-z2">
         <md-list class="md-dense" flex>
