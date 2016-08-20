@@ -12,14 +12,16 @@
     <script type='text/javascript' src='../bower_components/angular-material/angular-material.js'></script>
 
     <script type='text/javascript' src="../bower_components/pixi.js/bin/pixi.js"></script>
+    <script type='text/javascript' src="../bower_components/Matter/build/matter.js"></script>
+
 
     <script type='text/javascript' src='scripts/app.js'></script>
-    <script type='text/javascript' src="scripts/directives/pixi.js"></script>
+    <script type='text/javascript' src="scripts/directives/game.js"></script>
   </head>
   <body layout="column" ng-controller="plinko-controller">
     <div flex layout="row">
       <md-content flex id="game" class="md-whiteframe-z2">
-        <canvas pixi></canvas>
+        <canvas game></canvas>
       </md-content>
       <md-content flex="20" id="userlist" class="md-whiteframe-z2">
         <md-list class="md-dense" flex>
@@ -36,10 +38,10 @@
       <form flex name="playerEntryForm" ng-submit="addPlayer()">
         <md-input-container flex class="md-icon-float md-block">
           <label>Add a new player</label>
-          <input ng-model="newuser.name" type="text">
+          <input ng-model="newuser.name" type="text" ng-disabled="gameInplay" >
         </md-input-container>
       </form>
-      <md-button flex="20" ng-disabled="false" class="md-raised md-primary">Plinko!</md-button>
+      <md-button flex="20" ng-click="startGame();" ng-disabled="gameInplay" class="md-raised md-primary">Plinko!</md-button>
     </md-content>
   </body>
 </html>
