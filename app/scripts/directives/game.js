@@ -35,6 +35,7 @@ angular.module('plinko-app')
   }, 
   board : {
     wall : 'assets/board/element_grey_square.png',
+    point : 'assets/board/element_grey_diamond.png',
     trap : 'assets/board/bridgeA.png',
     pin : 'assets/board/pin.png',
     pin_hit : 'assets/board/pin_hit.png'
@@ -85,8 +86,8 @@ angular.module('plinko-app')
   };
 }])
 
-.service('board-service', ['properties', 'sprite', 'render-service', 'physics-service', 
-  function (properties, sprite, renderer, physics) {
+.service('board-service', ['$timeout', 'properties', 'sprite', 'render-service', 'physics-service', 
+  function ($timeout, properties, sprite, renderer, physics) {
     var Pin = function() {
       PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.pin));
       this.pivot.x = 24/2;
@@ -105,6 +106,20 @@ angular.module('plinko-app')
     };
 
     Brick.prototype = Object.create(PIXI.Sprite.prototype);
+
+    var Point = function(x, y) { 
+      PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.point));
+
+      this.x = x * properties.tileSize;
+      this.y = y * properties.tileSize;
+      this.pivot.x = this.pivot.y = 24;
+      this.scale.x = this.scale.y = 0.66667;
+
+      this.body = Matter.Bodies.rectangle((x) * properties.tileSize, (y) * properties.tileSize, properties.tileSize * 0.66667, properties.tileSize * 0.66667, { isStatic: true });
+      Matter.Body.setAngle(this.body, 3.14/4);
+    };
+
+    Point.prototype = Object.create(PIXI.Sprite.prototype);
 
     var Trapdoor = function(x, y) { 
         PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.wall));
@@ -136,9 +151,36 @@ angular.module('plinko-app')
           // Create trapdoors
           trapdoor = new Trapdoor(x, 2);
           renderer.stage.addChild(trapdoor);
-          //physics.add(trapdoor.body);
+          physics.add(trapdoor.body);
           trapdoors.push(trapdoor);
-        }
+       }
+
+        // Add points to push the tokens away from walls
+        physics.add(renderer.stage.addChild(new Point(1,6.5)).body);
+        physics.add(renderer.stage.addChild(new Point(1.5,7)).body);
+        physics.add(renderer.stage.addChild(new Point(1,7.5)).body); 
+
+        physics.add(renderer.stage.addChild(new Point(1,11.5)).body);
+        physics.add(renderer.stage.addChild(new Point(1.5,12)).body);
+        physics.add(renderer.stage.addChild(new Point(1,12.5)).body); 
+
+        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,6.5)).body);
+        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1.5,7)).body);
+        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,7.5)).body); 
+
+        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,11.5)).body);
+        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1.5,12)).body);
+        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,12.5)).body); 
+
+        physics.add(renderer.stage.addChild(new Point(3.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(6.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(9.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(12.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(15.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(18.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(21.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(24.5,17)).body);
+        physics.add(renderer.stage.addChild(new Point(27.5,17)).body);
 
         // Create Walls
         for(y = 0; y < properties.boardHeight; y++) {
@@ -156,9 +198,9 @@ angular.module('plinko-app')
 
         // Create Pins
         for(y = 0; y < 5; y++) {
-          for(x = 0; x < ((y%2)?9:10); x++) {
+          for(x = 0; x < ((y%2)?8:9); x++) {
             var pin = new Pin();
-            pin.x = 56 + 12 + x * 2 * 48 + ((y%2)?48:0);
+            pin.x = 56 + 12 + x * 2 * 48 + ((y%2)?96:48);
             pin.y = 128 + 12 + y * 1.732 * 48;
             renderer.stage.addChild(pin);
 
@@ -178,7 +220,16 @@ angular.module('plinko-app')
             physics.add(Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (properties.boardHeight-1) * properties.tileSize, properties.tileSize, properties.tileSize*2, { isStatic: true }));
           }
         }     
-      }
+      },
+
+    start : function () {
+      $timeout(() => {
+      while(trapdoors.length > 0) {
+          renderer.stage.removeChild(trapdoors[0]);
+          physics.remove(trapdoors[0].body);
+          trapdoors.shift();
+      }}, 600);
+    }
   };
 }])
 
@@ -254,6 +305,10 @@ angular.module('plinko-app')
 
     add : function(body) {
       Matter.World.add(engine.world, [body]);
+    },
+
+    remove : function(body) {
+      Matter.World.remove(engine.world, [body]);
     }
   };
 })
@@ -281,23 +336,6 @@ angular.module('plinko-app')
         textSample.y = 100;
         stage.addChild(textSample);
         */
-
-        /*
-        var token = new Token(sprite.board.background_panel);
-        stage.addChild(token);
-
-        token = new Token(sprite.board.background_panel);
-        token.y = 32;
-        stage.addChild(token);
-
-        token = new Token(sprite.board.background_panel);
-        token.x = 32;
-        stage.addChild(token);
-
-        token = new Token(sprite.board.background_panel);
-        token.x = 64;
-        stage.addChild(token);
-        */
     },
 
     render : function () {
@@ -306,9 +344,11 @@ angular.module('plinko-app')
   };
 }])
 
-.service('game', ['$interval', 'render-service', 'physics-service', 'player-service', function ($interval, renderService, physicsService, playerService) {
+.service('game', ['$interval', 'render-service', 'physics-service', 'board-service', 'player-service', 
+function ($interval, renderService, physicsService, boardService, playerService) {
   return {
     startGame : function (players) {
+      boardService.start();
       players.forEach(function(player) {
         playerService.spawn(player);
       }, this);
@@ -323,16 +363,22 @@ angular.module('plinko-app')
       physicsService.initialise();
       board.build();
 
-      /*requestAnimationFrame(() => {
+      var updateLoop = function () {
         physicsService.update();
+        playerService.update();
         renderService.render();
-      });*/
 
+        requestAnimationFrame(updateLoop);
+      };
+
+      requestAnimationFrame(updateLoop);
+
+      /*
       $interval(function () {
         physicsService.update();
         playerService.update();
         renderService.render();
-      }, 1000 / 60);
+      }, 1000 / 60);*/
     }
   };
 }]);
