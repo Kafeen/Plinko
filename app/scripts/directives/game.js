@@ -1,6 +1,13 @@
 'use strict';
 
 angular.module('plinko-app')
+.constant('properties', {
+  tileSize: 32,
+  boardWidth: 31,
+  boardHeight: 19
+})
+
+angular.module('plinko-app')
 .constant('sprite', {
   tokens : {
     elephant: 'assets/tokens/elephant.png',
@@ -27,7 +34,8 @@ angular.module('plinko-app')
     snake: 'assets/avatars/snake.png'
   }, 
   board : {
-    background_panel : 'assets/board/element_grey_square.png',
+    wall : 'assets/board/element_grey_square.png',
+    trap : 'assets/board/bridgeA.png',
     pin : 'assets/board/pin.png',
     pin_hit : 'assets/board/pin_hit.png'
   }
@@ -77,7 +85,8 @@ angular.module('plinko-app')
   };
 }])
 
-.service('board-service', ['sprite', 'render-service', 'physics-service', function (sprite, renderer, physics) {
+.service('board-service', ['properties', 'sprite', 'render-service', 'physics-service', 
+  function (properties, sprite, renderer, physics) {
     var Pin = function() {
       PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.pin));
       this.pivot.x = 24/2;
@@ -88,21 +97,87 @@ angular.module('plinko-app')
 
     Pin.prototype = Object.create(PIXI.Sprite.prototype);
 
+    var Brick = function(x, y) { 
+      PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.wall));
+
+      this.x = x * properties.tileSize;
+      this.y = y * properties.tileSize;
+    };
+
+    Brick.prototype = Object.create(PIXI.Sprite.prototype);
+
+    var Trapdoor = function(x, y) { 
+        PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.wall));
+
+        this.x = x * properties.tileSize;
+        this.y = y * properties.tileSize;
+
+        this.body = Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (y + 0.5) * properties.tileSize, properties.tileSize, properties.tileSize, { isStatic: true });
+    };
+
+    Trapdoor.prototype = Object.create(PIXI.Sprite.prototype);
+
+    var trapdoors = [];
+
   return {
       build : function () {
+        var x, y, tile, trapdoor;
 
-        for(var y = 0; y < 9; y++) {
-          for(var x = 0; x < ((y%2)?10:11); x++) {
+        // Create Entry Point
+        for(x = 0; x < properties.boardWidth; ++x) {
+          if(x%3 == 0) {
+            // Create walls between spawn points
+            renderer.stage.addChild(new Brick(x, 0));
+            renderer.stage.addChild(new Brick(x, 1));
+
+            physics.add(Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, properties.tileSize, properties.tileSize, properties.tileSize*2, { isStatic: true }));
+          }
+
+          // Create trapdoors
+          trapdoor = new Trapdoor(x, 2);
+          renderer.stage.addChild(trapdoor);
+          //physics.add(trapdoor.body);
+          trapdoors.push(trapdoor);
+        }
+
+        // Create Walls
+        for(y = 0; y < properties.boardHeight; y++) {
+          renderer.stage.addChild(new Brick(0, y));
+          renderer.stage.addChild(new Brick(properties.boardWidth-1, y));
+        }
+
+        for(x = 0; x < properties.boardWidth; ++x) {
+          renderer.stage.addChild(new Brick(x, properties.boardHeight-1));
+        }
+
+        physics.add(Matter.Bodies.rectangle(properties.tileSize*0.5, (properties.boardHeight*properties.tileSize)/2, properties.tileSize, properties.boardHeight*properties.tileSize, { isStatic: true }));
+        physics.add(Matter.Bodies.rectangle((properties.boardWidth-0.5)*properties.tileSize, (properties.boardHeight*properties.tileSize)/2, properties.tileSize, properties.boardHeight*properties.tileSize, { isStatic: true }));
+        physics.add(Matter.Bodies.rectangle((properties.boardWidth*0.5)*properties.tileSize, (properties.boardHeight - 0.5) * properties.tileSize, properties.boardWidth*properties.tileSize, properties.tileSize, { isStatic: true }));
+
+        // Create Pins
+        for(y = 0; y < 5; y++) {
+          for(x = 0; x < ((y%2)?9:10); x++) {
             var pin = new Pin();
-            pin.x = 12 + x * 2 * 32 + ((y%2)?32:0);
-            pin.y = 12 + y * 1.732 * 32;
+            pin.x = 56 + 12 + x * 2 * 48 + ((y%2)?48:0);
+            pin.y = 128 + 12 + y * 1.732 * 48;
             renderer.stage.addChild(pin);
 
             Matter.Body.setPosition(pin.body, { x: pin.x, y: pin.y })
+            pin.body.restitution = Math.random();
 
             physics.add(pin.body);
           }
-        }        
+        }
+
+        // Create Goals   
+        for(x = 0; x < properties.boardWidth; ++x) {
+          if(x%3 == 0) {
+            renderer.stage.addChild(new Brick(x, properties.boardHeight-1));
+            renderer.stage.addChild(new Brick(x, properties.boardHeight-2));
+
+            physics.add(Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (properties.boardHeight-1) * properties.tileSize, properties.tileSize, properties.tileSize*2, { isStatic: true }));
+          }
+        }     
       }
   };
 }])
@@ -130,10 +205,11 @@ angular.module('plinko-app')
         var token = new PlayerToken(player);
         token.scale.x = token.scale.y = (42/285);
 
-        var x = 64 * (player.spawn - 1) + 42;
-        var y = 0;
+        var x = 64 + 96 * (player.spawn - 1);
+        var y = 32;
 
         Matter.Body.setPosition(token.body, { x: x, y: y })
+        token.body.restitution = 0.8;
       
         renderer.stage.addChild(token);
         physics.add(token.body);
@@ -163,17 +239,13 @@ angular.module('plinko-app')
         // create an engine
         engine = Engine.create();
 
-        // create two boxes and a ground
-        var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
-
-        // add all of the bodies to the world
-        World.add(engine.world, [ground]);
-/*
+        /**
         var render = Matter.Render.create({
             element: document.body,
             engine: engine
         });
-        Matter.Render.run(render);*/
+        Matter.Render.run(render);
+        /**/
     },
 
     update : function() {
@@ -237,9 +309,7 @@ angular.module('plinko-app')
 .service('game', ['$interval', 'render-service', 'physics-service', 'player-service', function ($interval, renderService, physicsService, playerService) {
   return {
     startGame : function (players) {
-      console.log('Start game => ', players);
       players.forEach(function(player) {
-        console.log(player.name, '=>', player.token, player.spawn);
         playerService.spawn(player);
       }, this);
     }
