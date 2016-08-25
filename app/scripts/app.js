@@ -2,7 +2,7 @@
 const plinkoApp = angular.module('plinko-app', ['ngMaterial']);
 
 // Define the `PhoneListController` controller on the `phonecatApp` module
-plinkoApp.controller('plinko-controller', ['$scope', 'game', 'token-factory', 'spawn-factory', ($scope, game, tokenFactory, spawnFactory) => {
+plinkoApp.controller('plinko-controller', ['$scope', 'game-service', 'token-factory', 'spawn-factory', ($scope, game, tokenFactory, spawnFactory) => {
   console.log($scope);
 
   $scope.maxPlayers = 10;
