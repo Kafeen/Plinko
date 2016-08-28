@@ -24,32 +24,46 @@
     <script type='text/javascript' src="scripts/players/player.js"></script>
     <script type='text/javascript' src="scripts/players/token.js"></script>
     <script type='text/javascript' src="scripts/renderer/renderer.js"></script>
-    
+    <script type='text/javascript' src="scripts/renderer/resize.js"></script>
+    <style>
+      body {
+        background:black;        
+      }
+
+      .centre {
+        position: absolute; 
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
   </head>
-  <body layout="column" ng-controller="plinko-controller">
-    <div flex layout="row">
-      <md-content flex id="game" class="md-whiteframe-z2">
-        <canvas game></canvas>
-      </md-content>
-      <md-content flex="20" id="userlist" class="md-whiteframe-z2">
-        <md-list class="md-dense" flex>
-          <md-list-item class="md-1-line" ng-repeat="player in players" ng-click="null">
-          <img ng-src="{{player.token.avatar}}" class="md-avatar" alt="{{item.who}}" />
-          <div class="md-list-item-text" layout="column">
-            <h3>{{ player.name }}</h3>
-          </div>
-          </md-list-item>
-        </md-list>
+  <body ng-controller="plinko-controller">
+    <canvas class="centre" game resize style="z-index: 1;"></canvas>
+    <div class="centre" resize style="z-index: 2;" layout="column">
+      <div flex layout="row">
+        <div flex id="game">        
+        </div>
+        <md-content flex="20" id="userlist" class="md-whiteframe-z2">
+          <md-list class="md-dense" flex>
+            <md-list-item class="md-1-line" ng-repeat="player in players" ng-click="null">
+            <img ng-src="{{player.token.avatar}}" class="md-avatar" alt="{{item.who}}" />
+            <div class="md-list-item-text" layout="column">
+              <h3>{{ player.name }}</h3>
+            </div>
+            </md-list-item>
+          </md-list>
+        </md-content>
+      </div>
+      <md-content layout="row" flex="10" id="inputbar" class="md-whiteframe-z2">
+        <form flex name="playerEntryForm" ng-submit="addPlayer()">
+          <md-input-container flex class="md-icon-float md-block">
+            <label>Add a new player</label>
+            <input ng-model="newuser.name" type="text" ng-disabled="gameInplay||(players.length >= maxPlayers)" >
+          </md-input-container>
+        </form>
+        <md-button flex="20" ng-click="startGame();" ng-disabled="gameInplay" class="md-raised md-primary">Plinko!</md-button>
       </md-content>
     </div>
-    <md-content layout="row" flex="10" id="inputbar" class="md-whiteframe-z2">
-      <form flex name="playerEntryForm" ng-submit="addPlayer()">
-        <md-input-container flex class="md-icon-float md-block">
-          <label>Add a new player</label>
-          <input ng-model="newuser.name" type="text" ng-disabled="gameInplay||(players.length >= maxPlayers)" >
-        </md-input-container>
-      </form>
-      <md-button flex="20" ng-click="startGame();" ng-disabled="gameInplay" class="md-raised md-primary">Plinko!</md-button>
-    </md-content>
   </body>
 </html>

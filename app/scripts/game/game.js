@@ -14,10 +14,11 @@ function ($interval, renderService, physicsService, boardService, playerService)
   }
 }])
 
-.directive('game', ['$interval', 'render-service', 'physics-service', 'board-service', 'player-service', function ($interval, renderService, physicsService, board, playerService) {
+.directive('game', ['$window', 'render-service', 'physics-service', 'board-service', 'player-service', 
+  function ($window, renderService, physicsService, board, playerService) {
   return {
     link: function ($scope, $element) {
-      renderService.initialise($element[0]);
+      renderService.initialise($element[0], $window.innerWidth, $window.innerHeight);
       physicsService.initialise();
       board.build();
 
