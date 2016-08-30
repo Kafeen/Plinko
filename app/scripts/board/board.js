@@ -49,6 +49,27 @@ angular.module('plinko-app')
 
     var trapdoors = [];
 
+    var Lava = function(x, y) {
+        PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.lava_low));
+
+        this.x = x * properties.tileSize;
+        this.y = y * properties.tileSize;
+        this.pivot.y = -24;
+        this.scale.x = this.scale.y = 0.5;
+
+        this.body = Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (properties.boardHeight-1) * properties.tileSize, properties.tileSize * 2, properties.tileSize, { isStatic: true, isSensor: true, label: properties.LABELS.LAVA });
+        this.body.onCollisionActive = (other) => {
+            if(other.label === properties.LABELS.PLAYER) {
+                other.sprite.damage();
+            }
+        };
+    };
+
+    Lava.prototype = Object.create(PIXI.Sprite.prototype);
+
+    var lava = [];
+
+
   return {
       build : function () {
         var x, y, tile, trapdoor;
@@ -69,6 +90,19 @@ angular.module('plinko-app')
           physics.add(trapdoor.body);
           trapdoors.push(trapdoor);
        }
+
+        // Create Goals   
+        for(x = 0; x < properties.boardWidth; ++x) {
+          if(x%3 == 0) {
+            renderer.stage.addChild(new Brick(x, properties.boardHeight-1));
+            renderer.stage.addChild(new Brick(x, properties.boardHeight-2));
+
+            physics.add(Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (properties.boardHeight-1) * properties.tileSize, properties.tileSize, properties.tileSize*2, { isStatic: true }));
+          }
+          else if(x%3 == 1 && Math.random() > 0.5) {
+            physics.add(renderer.stage.addChild(new Lava(x, properties.boardHeight-3)).body);
+          }
+        } 
 
         // Add points to push the tokens away from walls
         physics.add(renderer.stage.addChild(new Point(1,6.5)).body);
@@ -124,17 +158,7 @@ angular.module('plinko-app')
 
             physics.add(pin.body);
           }
-        }
-
-        // Create Goals   
-        for(x = 0; x < properties.boardWidth; ++x) {
-          if(x%3 == 0) {
-            renderer.stage.addChild(new Brick(x, properties.boardHeight-1));
-            renderer.stage.addChild(new Brick(x, properties.boardHeight-2));
-
-            physics.add(Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (properties.boardHeight-1) * properties.tileSize, properties.tileSize, properties.tileSize*2, { isStatic: true }));
-          }
-        }     
+        }    
       },
 
     start : function () {

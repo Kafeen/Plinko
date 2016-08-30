@@ -3,8 +3,13 @@
 angular.module('plinko-app')
 .constant('properties', {
   canvasWidth : 1280,
-  canvasHeight : 676,
+  canvasHeight : 676  ,
   tileSize: 32,
   boardWidth: 31,
-  boardHeight: 19
+  boardHeight: 19,
+
+  LABELS: {
+    PLAYER: 'PLAYER',
+    LAVA: 'LAVA'
+  }
 });

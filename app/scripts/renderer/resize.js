@@ -27,7 +27,7 @@ angular.module('plinko-app')
             view.style.width = width+'px';
             view.style.height = height+'px';
 
-            $scope.$digest();
+            // $scope.$digest();
         }
 
         $scope.$on('$destroy', () => {

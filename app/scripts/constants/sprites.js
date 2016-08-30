@@ -31,6 +31,8 @@ angular.module('plinko-app')
     point : 'assets/board/element_grey_diamond.png',
     trap : 'assets/board/bridgeA.png',
     pin : 'assets/board/pin.png',
-    pin_hit : 'assets/board/pin_hit.png'
+    pin_hit : 'assets/board/pin_hit.png',
+    lava_high : 'assets/board/lavaTop_high.png',
+    lava_low : 'assets/board/lavaTop_low.png'
   }
 })
