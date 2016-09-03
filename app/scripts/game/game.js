@@ -6,16 +6,21 @@ angular.module('plinko-app')
 function ($interval, renderService, physicsService, boardService, playerService) {
   return {
     startGame : function (players) {
+
       boardService.start();
+      // Spawn players
       players.forEach(function(player) {
-        playerService.spawn(player);
+        playerService.create()
+          .withSprite(player.token.avatar)
+          .withRadius(20)
+          .atSpawnPosition(player.spawn);
       }, this);
     }
   }
 }])
 
-.directive('game', ['$window', 'render-service', 'physics-service', 'board-service', 'player-service', 
-  function ($window, renderService, physicsService, board, playerService) {
+.directive('game', ['$window', 'render-service', 'physics-service', 'board-service', 'player-service', 'endgame', 
+  function ($window, renderService, physicsService, board, playerService, endgame) {
   return {
     link: function ($scope, $element) {
       renderService.initialise($element[0], $window.innerWidth, $window.innerHeight);
@@ -24,8 +29,11 @@ function ($interval, renderService, physicsService, boardService, playerService)
 
       var updateLoop = function () {
         physicsService.update();
-        playerService.update();
+        // TODO: Update players
+        //  playerService.update();
         renderService.render();
+        endgame.check();
+        TWEEN.update();
 
         requestAnimationFrame(updateLoop);
       };

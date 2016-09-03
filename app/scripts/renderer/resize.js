@@ -2,8 +2,8 @@
 
 angular.module('plinko-app')
 
-.directive('resize', ['$window', 'properties', 'render-service', 
-  function ($window, properties, renderService) {
+.directive('resize', ['$window', 'PROPERTIES', 'render-service', 
+  function ($window, PROPERTIES, renderService) {
     return {
       restrict: 'A',
       link : function($scope, $element) {
@@ -15,7 +15,7 @@ angular.module('plinko-app')
             var view = $element[0];
             var width = $window.innerWidth;
             var height = $window.innerHeight;
-            var ratio = properties.canvasWidth/properties.canvasHeight;
+            var ratio = PROPERTIES.canvasWidth/PROPERTIES.canvasHeight;
             var windowRatio = width/height;
 
             if(ratio>windowRatio) {

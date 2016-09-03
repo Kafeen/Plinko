@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('plinko-app')
-.service('board-service', ['$timeout', 'properties', 'sprite', 'render-service', 'physics-service', 
-  function ($timeout, properties, sprite, renderer, physics) {
+.service('board-service', ['$timeout', 'PROPERTIES', 'sprite', 'render-service', 'physics-service', 
+  function ($timeout, PROPERTIES, sprite, renderer, physics) {
     var Pin = function() {
       PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.pin));
       this.pivot.x = 24/2;
@@ -16,8 +16,8 @@ angular.module('plinko-app')
     var Brick = function(x, y) { 
       PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.wall));
 
-      this.x = x * properties.tileSize;
-      this.y = y * properties.tileSize;
+      this.x = x * PROPERTIES.tileSize;
+      this.y = y * PROPERTIES.tileSize;
     };
 
     Brick.prototype = Object.create(PIXI.Sprite.prototype);
@@ -25,12 +25,12 @@ angular.module('plinko-app')
     var Point = function(x, y) { 
       PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.point));
 
-      this.x = x * properties.tileSize;
-      this.y = y * properties.tileSize;
+      this.x = x * PROPERTIES.tileSize;
+      this.y = y * PROPERTIES.tileSize;
       this.pivot.x = this.pivot.y = 24;
       this.scale.x = this.scale.y = 0.66667;
 
-      this.body = Matter.Bodies.rectangle((x) * properties.tileSize, (y) * properties.tileSize, properties.tileSize * 0.66667, properties.tileSize * 0.66667, { isStatic: true });
+      this.body = Matter.Bodies.rectangle((x) * PROPERTIES.tileSize, (y) * PROPERTIES.tileSize, PROPERTIES.tileSize * 0.66667, PROPERTIES.tileSize * 0.66667, { isStatic: true });
       Matter.Body.setAngle(this.body, 3.14/4);
     };
 
@@ -39,10 +39,10 @@ angular.module('plinko-app')
     var Trapdoor = function(x, y) { 
         PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.wall));
 
-        this.x = x * properties.tileSize;
-        this.y = y * properties.tileSize;
+        this.x = x * PROPERTIES.tileSize;
+        this.y = y * PROPERTIES.tileSize;
 
-        this.body = Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (y + 0.5) * properties.tileSize, properties.tileSize, properties.tileSize, { isStatic: true });
+        this.body = Matter.Bodies.rectangle((x + 0.5) * PROPERTIES.tileSize, (y + 0.5) * PROPERTIES.tileSize, PROPERTIES.tileSize, PROPERTIES.tileSize, { isStatic: true });
     };
 
     Trapdoor.prototype = Object.create(PIXI.Sprite.prototype);
@@ -52,17 +52,17 @@ angular.module('plinko-app')
     var Lava = function(x, y) {
         PIXI.Sprite.call(this, PIXI.Texture.fromImage(sprite.board.lava_low));
 
-        this.x = x * properties.tileSize;
-        this.y = y * properties.tileSize;
+        this.x = x * PROPERTIES.tileSize;
+        this.y = y * PROPERTIES.tileSize;
         this.pivot.y = -24;
         this.scale.x = this.scale.y = 0.5;
 
-        this.body = Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (properties.boardHeight-1) * properties.tileSize, properties.tileSize * 2, properties.tileSize, { isStatic: true, isSensor: true, label: properties.LABELS.LAVA });
-        this.body.onCollisionActive = (other) => {
-            if(other.label === properties.LABELS.PLAYER) {
-                other.sprite.damage();
+        this.body = Matter.Bodies.rectangle((x + 0.5) * PROPERTIES.tileSize, (PROPERTIES.boardHeight-1) * PROPERTIES.tileSize, PROPERTIES.tileSize * 2, PROPERTIES.tileSize, { isStatic: true, isSensor: true, label: PROPERTIES.LABELS.LAVA });
+        /*this.body.onCollisionActive = (other) => {
+            if(other.label === PROPERTIES.LABELS.PLAYER) {
+                other.sprite.reduceHealthBy(1);
             }
-        };
+        };*/
     };
 
     Lava.prototype = Object.create(PIXI.Sprite.prototype);
@@ -75,13 +75,13 @@ angular.module('plinko-app')
         var x, y, tile, trapdoor;
 
         // Create Entry Point
-        for(x = 0; x < properties.boardWidth; ++x) {
+        for(x = 0; x < PROPERTIES.boardWidth; ++x) {
           if(x%3 == 0) {
             // Create walls between spawn points
             renderer.stage.addChild(new Brick(x, 0));
             renderer.stage.addChild(new Brick(x, 1));
 
-            physics.add(Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, properties.tileSize, properties.tileSize, properties.tileSize*2, { isStatic: true }));
+            physics.add(Matter.Bodies.rectangle((x + 0.5) * PROPERTIES.tileSize, PROPERTIES.tileSize, PROPERTIES.tileSize, PROPERTIES.tileSize*2, { isStatic: true }));
           }
 
           // Create trapdoors
@@ -92,15 +92,15 @@ angular.module('plinko-app')
        }
 
         // Create Goals   
-        for(x = 0; x < properties.boardWidth; ++x) {
+        for(x = 0; x < PROPERTIES.boardWidth; ++x) {
           if(x%3 == 0) {
-            renderer.stage.addChild(new Brick(x, properties.boardHeight-1));
-            renderer.stage.addChild(new Brick(x, properties.boardHeight-2));
+            renderer.stage.addChild(new Brick(x, PROPERTIES.boardHeight-1));
+            renderer.stage.addChild(new Brick(x, PROPERTIES.boardHeight-2));
 
-            physics.add(Matter.Bodies.rectangle((x + 0.5) * properties.tileSize, (properties.boardHeight-1) * properties.tileSize, properties.tileSize, properties.tileSize*2, { isStatic: true }));
+            physics.add(Matter.Bodies.rectangle((x + 0.5) * PROPERTIES.tileSize, (PROPERTIES.boardHeight-1) * PROPERTIES.tileSize, PROPERTIES.tileSize, PROPERTIES.tileSize*2, { isStatic: true }));
           }
           else if(x%3 == 1 && Math.random() > 0.5) {
-            physics.add(renderer.stage.addChild(new Lava(x, properties.boardHeight-3)).body);
+            physics.add(renderer.stage.addChild(new Lava(x, PROPERTIES.boardHeight-3)).body);
           }
         } 
 
@@ -113,13 +113,13 @@ angular.module('plinko-app')
         physics.add(renderer.stage.addChild(new Point(1.5,12)).body);
         physics.add(renderer.stage.addChild(new Point(1,12.5)).body); 
 
-        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,6.5)).body);
-        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1.5,7)).body);
-        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,7.5)).body); 
+        physics.add(renderer.stage.addChild(new Point(PROPERTIES.boardWidth - 1,6.5)).body);
+        physics.add(renderer.stage.addChild(new Point(PROPERTIES.boardWidth - 1.5,7)).body);
+        physics.add(renderer.stage.addChild(new Point(PROPERTIES.boardWidth - 1,7.5)).body); 
 
-        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,11.5)).body);
-        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1.5,12)).body);
-        physics.add(renderer.stage.addChild(new Point(properties.boardWidth - 1,12.5)).body); 
+        physics.add(renderer.stage.addChild(new Point(PROPERTIES.boardWidth - 1,11.5)).body);
+        physics.add(renderer.stage.addChild(new Point(PROPERTIES.boardWidth - 1.5,12)).body);
+        physics.add(renderer.stage.addChild(new Point(PROPERTIES.boardWidth - 1,12.5)).body); 
 
         physics.add(renderer.stage.addChild(new Point(3.5,17)).body);
         physics.add(renderer.stage.addChild(new Point(6.5,17)).body);
@@ -132,18 +132,18 @@ angular.module('plinko-app')
         physics.add(renderer.stage.addChild(new Point(27.5,17)).body);
 
         // Create Walls
-        for(y = 0; y < properties.boardHeight; y++) {
+        for(y = 0; y < PROPERTIES.boardHeight; y++) {
           renderer.stage.addChild(new Brick(0, y));
-          renderer.stage.addChild(new Brick(properties.boardWidth-1, y));
+          renderer.stage.addChild(new Brick(PROPERTIES.boardWidth-1, y));
         }
 
-        for(x = 0; x < properties.boardWidth; ++x) {
-          renderer.stage.addChild(new Brick(x, properties.boardHeight-1));
+        for(x = 0; x < PROPERTIES.boardWidth; ++x) {
+          renderer.stage.addChild(new Brick(x, PROPERTIES.boardHeight-1));
         }
 
-        physics.add(Matter.Bodies.rectangle(properties.tileSize*0.5, (properties.boardHeight*properties.tileSize)/2, properties.tileSize, properties.boardHeight*properties.tileSize, { isStatic: true }));
-        physics.add(Matter.Bodies.rectangle((properties.boardWidth-0.5)*properties.tileSize, (properties.boardHeight*properties.tileSize)/2, properties.tileSize, properties.boardHeight*properties.tileSize, { isStatic: true }));
-        physics.add(Matter.Bodies.rectangle((properties.boardWidth*0.5)*properties.tileSize, (properties.boardHeight - 0.5) * properties.tileSize, properties.boardWidth*properties.tileSize, properties.tileSize, { isStatic: true }));
+        physics.add(Matter.Bodies.rectangle(PROPERTIES.tileSize*0.5, (PROPERTIES.boardHeight*PROPERTIES.tileSize)/2, PROPERTIES.tileSize, PROPERTIES.boardHeight*PROPERTIES.tileSize, { isStatic: true }));
+        physics.add(Matter.Bodies.rectangle((PROPERTIES.boardWidth-0.5)*PROPERTIES.tileSize, (PROPERTIES.boardHeight*PROPERTIES.tileSize)/2, PROPERTIES.tileSize, PROPERTIES.boardHeight*PROPERTIES.tileSize, { isStatic: true }));
+        physics.add(Matter.Bodies.rectangle((PROPERTIES.boardWidth*0.5)*PROPERTIES.tileSize, (PROPERTIES.boardHeight - 0.5) * PROPERTIES.tileSize, PROPERTIES.boardWidth*PROPERTIES.tileSize, PROPERTIES.tileSize, { isStatic: true }));
 
         // Create Pins
         for(y = 0; y < 5; y++) {

@@ -13,7 +13,9 @@ angular.module('plinko-app')
             Events = Matter.Events;
 
         // create an engine
-        engine = Engine.create();
+        engine = Engine.create({enableSleeping: true});
+        console.log('PHYSICS : ', this);
+        console.log('PHYSICS ENGINE: ', engine);
 
         Events.on(engine, 'collisionStart', function(event) {
                 var pairs = event.pairs;
@@ -79,6 +81,10 @@ angular.module('plinko-app')
 
     remove : function(body) {
       Matter.World.remove(engine.world, [body]);
+    },
+
+    on : function(event, callback) {
+        Matter.Events.on(engine, event, callback);
     }
   };
 });

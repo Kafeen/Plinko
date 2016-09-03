@@ -19,6 +19,7 @@
     "angular-material": "^1.0.9",
     "pixi.js": "pixi#^3.0.11",
     "livereload-js": "livereload#^2.2.1",
-    "Matter": "matter-js#^0.10.0"
+    "Matter": "matter-js#^0.10.0",
+    "tween.js": "tweenjs#^16.3.5"
   }
 }

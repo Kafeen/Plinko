@@ -2,8 +2,8 @@
 
 angular.module('plinko-app')
 
-.service('render-service', ['properties', 'sprite', 
-    function(properties, sprite) {
+.service('render-service', ['PROPERTIES', 'sprite', 
+    function(PROPERTIES, sprite) {
         var renderer;
         var stage;
         
@@ -11,7 +11,7 @@ angular.module('plinko-app')
             get stage () { return stage; },
 
             initialise : function(canvas, width, height) { 
-                renderer = PIXI.autoDetectRenderer(properties.canvasWidth, properties.canvasHeight,{backgroundColor : 0x9EDDE7, view : canvas});
+                renderer = PIXI.autoDetectRenderer(PROPERTIES.canvasWidth, PROPERTIES.canvasHeight,{backgroundColor : 0x9EDDE7, view : canvas});
                 stage = new PIXI.Container();
 
                 this.resize(width, height);
@@ -22,7 +22,7 @@ angular.module('plinko-app')
             },
 
             resize : function(width, height) {
-                var ratio = properties.canvasWidth/properties.canvasHeight;
+                var ratio = PROPERTIES.canvasWidth/PROPERTIES.canvasHeight;
                 var windowRatio = width/height;
 
                 if(ratio>windowRatio) {

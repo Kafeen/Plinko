@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('plinko-app')
-.constant('properties', {
+.constant('PROPERTIES', {
   canvasWidth : 1280,
   canvasHeight : 676  ,
   tileSize: 32,

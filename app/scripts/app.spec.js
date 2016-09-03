@@ -6,7 +6,7 @@ describe('plinko-controller', function() {
     var scope = {};
     var ctrl = $controller('plinko-controller', {$scope: scope});
 
-    expect(scope.platers.length).toBe(3);
+
   }));
 
 });
