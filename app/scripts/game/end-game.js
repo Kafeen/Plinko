@@ -2,30 +2,47 @@
 
 angular.module('plinko-app')
 
-.service('endgame', ['physics-service', 'board-service', 'player-service', 'render-service',
-function (physicsService, boardService, playerService, renderService) {
+.service('endgame', ['physics-service', 'board-service', 'player-factory', 'render-service',
+function (physicsService, boardService, playerFactory, renderService) {
   return {
     check : function () {
         // Is everything dead?
-        if(playerService.numberOfAliveTokens === 0) {
+        var numberOfPlayers = playerFactory.allPlayers
+            .length;
+
+        var numberOfPlayersAlive = playerFactory.allPlayers
+            .filter((player) => {return (player.health > 0)})
+            .length;
+
+        var numberOfPlayersAwake = playerFactory.allPlayers
+            .filter((player) => {return (player.body.isSleeping === false)})
+            .length;
+
+        if(numberOfPlayers === 0 ) {
+            return;
+        }
+        else if(numberOfPlayersAlive === 0) {
             // Everyone dead, Tie round
 
             // TODO: Respawn players killed this round
+            console.log('Respawn players killed this round');
             /*
-            playerService
+             playerFactory
                 .allPlayers
                 .filter((player) => {player.roundKilled === game.currentRound})
                 .do((player) => {console.log(player.name)});
             */
-        } else if(playerService.numberOfAwakeTokens === 0) {
-            if(playerService.numberOfAliveTokens === 1) {
+        } else if(numberOfPlayersAwake === 0) {
+            if(numberOfPlayersAlive === 1) {
                 // We have a winner..
 
                 // TODO: Display winner popup
+                console.log('Display winner popup');
             } else if(this.scolling === false) {
                 //  Next round...
 
                 // TODO: Generate a new level below the existing one
+                console.log('Generate a new level below the existing one');
 
                 // Scroll to the next level
                 new TWEEN.Tween(renderService.stage.position)

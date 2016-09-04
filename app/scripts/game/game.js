@@ -2,25 +2,26 @@
 
 angular.module('plinko-app')
 
-.service('game-service', ['$interval', 'render-service', 'physics-service', 'board-service', 'player-service', 
-function ($interval, renderService, physicsService, boardService, playerService) {
+.service('game-service', ['$interval', 'render-service', 'physics-service', 'board-service', 'player-factory',
+function ($interval, renderService, physicsService, boardService, playerFactory) {
   return {
     startGame : function (players) {
 
       boardService.start();
       // Spawn players
       players.forEach(function(player) {
-        playerService.create()
-          .withSprite(player.token.avatar)
-          .withRadius(20)
-          .atSpawnPosition(player.spawn);
+        playerFactory
+            .withSprite(player.token.avatar)
+            .withParent(renderService.stage)
+            .withSpawnPosition(player.spawn)
+            .build();
       }, this);
     }
   }
 }])
 
-.directive('game', ['$window', 'render-service', 'physics-service', 'board-service', 'player-service', 'endgame', 
-  function ($window, renderService, physicsService, board, playerService, endgame) {
+.directive('game', ['$window', 'render-service', 'physics-service', 'board-service', 'endgame',
+  function ($window, renderService, physicsService, board, endgame) {
   return {
     link: function ($scope, $element) {
       renderService.initialise($element[0], $window.innerWidth, $window.innerHeight);
@@ -29,8 +30,6 @@ function ($interval, renderService, physicsService, boardService, playerService)
 
       var updateLoop = function () {
         physicsService.update();
-        // TODO: Update players
-        //  playerService.update();
         renderService.render();
         endgame.check();
         TWEEN.update();

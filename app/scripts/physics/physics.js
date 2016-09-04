@@ -14,8 +14,6 @@ angular.module('plinko-app')
 
         // create an engine
         engine = Engine.create({enableSleeping: true});
-        console.log('PHYSICS : ', this);
-        console.log('PHYSICS ENGINE: ', engine);
 
         Events.on(engine, 'collisionStart', function(event) {
                 var pairs = event.pairs;
