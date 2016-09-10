@@ -2,15 +2,15 @@
 
 angular.module('plinko-app')
 
-.service('render-service', ['PROPERTIES', 'sprite', 
+.service('render-service', ['PROPERTIES', 'sprite',
     function(PROPERTIES, sprite) {
         var renderer;
         var stage;
-        
+
         return {
             get stage () { return stage; },
 
-            initialise : function(canvas, width, height) { 
+            initialise : function(canvas, width, height) {
                 renderer = PIXI.autoDetectRenderer(PROPERTIES.canvasWidth, PROPERTIES.canvasHeight,{backgroundColor : 0x9EDDE7, view : canvas});
                 stage = new PIXI.Container();
 

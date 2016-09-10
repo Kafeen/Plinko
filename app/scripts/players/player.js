@@ -1,15 +1,15 @@
-var PlayerToken = function() {
+var PlayerToken = function(texture) {
     var self = this;
+    PIXI.Sprite.call(self, PIXI.Texture.fromImage(texture));
 
-    self.sprite = null;
     self.body = null;
     self.spawnPosition = 0;
 
     // Events
     self.onAfterUpdate = function(event) {
-        self.sprite.position.x = self.body.position.x;
-        self.sprite.position.y = self.body.position.y;
-        self.sprite.rotation = self.body.angle;
+        self.position.x = self.body.position.x;
+        self.position.y = self.body.position.y;
+        self.rotation = self.body.angle;
     };
 
     self.onCollisionActive = function(event) {
@@ -25,3 +25,5 @@ var PlayerToken = function() {
         self.health = Math.max(0, self.health - reduction);
     }
 };
+
+PlayerToken.prototype = Object.create(PIXI.Sprite.prototype);

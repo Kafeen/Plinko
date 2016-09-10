@@ -43,16 +43,15 @@ angular.module('plinko-app')
                 },
 
                 build: function () {
-                    var result = new PlayerToken();
+                    var result = new PlayerToken(properties.sprite.texture);
 
                     // Create the sprite
-                    result.sprite = new PIXI.Sprite(PIXI.Texture.fromImage(properties.sprite.texture));
-                    result.sprite.pivot.x = properties.sprite.pivot.x;
-                    result.sprite.pivot.y = properties.sprite.pivot.y;
-                    result.sprite.scale.x = properties.sprite.scale.x;
-                    result.sprite.scale.y = properties.sprite.scale.y;
+                    result.pivot.x = properties.sprite.pivot.x;
+                    result.pivot.y = properties.sprite.pivot.y;
+                    result.scale.x = properties.sprite.scale.x;
+                    result.scale.y = properties.sprite.scale.y;
                     if(properties.parent !== undefined ) {
-                        properties.parent.addChild(result.sprite);
+                        properties.parent.addChild(result);
                     }
 
                     // Create the body

@@ -5,7 +5,7 @@ angular.module('plinko-app')
 .service('token-factory', ['sprite', function (sprite) {
   var allTokens = ['elephant', 'giraffe', 'hippo', 'monkey', 'panda', 'parrot', 'penguin', 'pig', 'rabbit', 'snake'];
   var unusedTokens = allTokens.slice();
- 
+
   return {
     clear : function () {
       unusedTokens = allTokens.slice();
@@ -20,6 +20,6 @@ angular.module('plinko-app')
         return {id:token, avatar:sprite.avatars[token], token:sprite.tokens[token]};
       }
       return '';
-    }    
+    }
   };
 }]);

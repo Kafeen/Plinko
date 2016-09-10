@@ -2,7 +2,7 @@
 
 angular.module('plinko-app')
 
-.directive('resize', ['$window', 'PROPERTIES', 'render-service', 
+.directive('resize', ['$window', 'PROPERTIES', 'render-service',
   function ($window, PROPERTIES, renderService) {
     return {
       restrict: 'A',
