@@ -12,6 +12,7 @@
   },
   "scripts": {
     "test": "xo",
+    "prestart": "npm install && bower install ./app",
     "start": "electron .",
     "build": "electron-packager . --out=dist --app-version=$npm_package_version --prune --asar --overwrite --all"
   },
