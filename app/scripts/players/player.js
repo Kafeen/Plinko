@@ -16,7 +16,7 @@ var PlayerToken = function(texture) {
         // Check for collision with lava
         event.pairs
             .filter((element, index, array) => {return (element.bodyA.label === "LAVA" && element.bodyB === self.body)})
-            .forEach((element, index, array) => {self.reduceHealthBy(1);});
+        .forEach((element, index, array) => {self.reduceHealthBy(1);});
     };
 
     // Health

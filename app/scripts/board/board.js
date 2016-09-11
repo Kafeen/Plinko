@@ -1,108 +1,129 @@
 'use strict';
 
 angular.module('plinko-app')
-.service('board-service', ['$timeout', 'PROPERTIES', 'sprite', 'render-service', 'physics-service', 'brick-factory', 'trapdoor-factory', 'lava-factory', 'point-factory',
-  function ($timeout, PROPERTIES, sprite, renderer, physics, brick, trapdoorFactory, lavaFactory, pointFactory) {
-    var trapdoors = [];
+    .service('board-service', ['$timeout', 'PROPERTIES', 'sprite', 'render-service', 'physics-service', 'brick-factory', 'trapdoor-factory', 'lava-factory', 'point-factory',
+        function ($timeout, PROPERTIES, sprite, renderer, physics, brick, trapdoorFactory, lavaFactory, pointFactory) {
+            var trapdoors = [[]];
+            var currentLevel = 0;
 
-  return {
-      build : function () {
-        var x, y, tile, trapdoor;
+            return {
+                build : function () {
+                    this.createTraps(currentLevel, [false, false, false, false, false, false, false, false, false, false]);
+                    this.createTraps(currentLevel + 1, [false, true, false, true, false, true, false, true, false, true]);
+                    this.createLeftWall(currentLevel);
+                    this.createRightWall(currentLevel);
+                    this.createPins(currentLevel);
 
-        // Create Entry Point
-        for(x = 0; x < PROPERTIES.boardWidth; ++x) {
-          if(x%3 == 0) {
-            // Create walls between spawn points
-            renderer.stage.addChild(brick.create(x, 0));
-            renderer.stage.addChild(brick.create(sprite.board.wall, x, 1));
+                    /*
+                     // Add points to push the tokens away from walls
+                     physics.add(renderer.stage.addChild(pointFactory.create(1,6.5)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(1.5,7)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(1,7.5)).body);
 
-            physics.add(Matter.Bodies.rectangle((x + 0.5) * PROPERTIES.tileSize, PROPERTIES.tileSize, PROPERTIES.tileSize, PROPERTIES.tileSize*2, { isStatic: true }));
-          }
+                     physics.add(renderer.stage.addChild(pointFactory.create(1,11.5)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(1.5,12)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(1,12.5)).body);
 
-          // Create trapdoors
-          trapdoor = trapdoorFactory.create(x, 2);
-          renderer.stage.addChild(trapdoor);
-          physics.add(trapdoor.body);
-          trapdoors.push(trapdoor);
-       }
+                     physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,6.5)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1.5,7)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,7.5)).body);
 
-        // Create Goals
-        for(x = 0; x < PROPERTIES.boardWidth; ++x) {
-          if(x%3 == 0) {
-            renderer.stage.addChild(brick.create(x, PROPERTIES.boardHeight-1));
-            renderer.stage.addChild(brick.create(x, PROPERTIES.boardHeight-2));
+                     physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,11.5)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1.5,12)).body);
+                     physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,12.5)).body);
 
-            physics.add(Matter.Bodies.rectangle((x + 0.5) * PROPERTIES.tileSize, (PROPERTIES.boardHeight-1) * PROPERTIES.tileSize, PROPERTIES.tileSize, PROPERTIES.tileSize*2, { isStatic: true }));
-          }
-          else if(x%3 == 1 && Math.random() > 0.5) {
-            physics.add(renderer.stage.addChild(lavaFactory.create(x, PROPERTIES.boardHeight-3)).body);
-          }
-        }
 
-        // Add points to push the tokens away from walls
-        physics.add(renderer.stage.addChild(pointFactory.create(1,6.5)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(1.5,7)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(1,7.5)).body);
+                     */
+                },
 
-        physics.add(renderer.stage.addChild(pointFactory.create(1,11.5)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(1.5,12)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(1,12.5)).body);
+                next : function () {
+                    currentLevel++;
 
-        physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,6.5)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1.5,7)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,7.5)).body);
+                    this.createTraps(currentLevel + 1, [true, false, true, false, true, false, true, false, true, false]);
+                    this.createLeftWall(currentLevel);
+                    this.createRightWall(currentLevel);
+                    this.createPins(currentLevel);
+                },
 
-        physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,11.5)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1.5,12)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(PROPERTIES.boardWidth - 1,12.5)).body);
+                createPins : function (levelId) {
+                    var baseY = levelId * (PROPERTIES.boardHeight - 3) * PROPERTIES.tileSize;
+                    for(var y = 0; y < 5; y++) {
+                        for(var x = 0; x < ((y%2)?8:9); x++) {
+                            var pin = new Pin(sprite.board.pin);
+                            pin.x = 56 + 12 + x * 2 * 48 + ((y%2)?96:48);
+                            pin.y = baseY + 128 + 12 + y * 1.732 * 48;
+                            renderer.stage.addChild(pin);
 
-        physics.add(renderer.stage.addChild(pointFactory.create(3.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(6.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(9.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(12.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(15.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(18.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(21.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(24.5,17)).body);
-        physics.add(renderer.stage.addChild(pointFactory.create(27.5,17)).body);
+                            Matter.Body.setPosition(pin.body, { x: pin.x, y: pin.y });
+                            pin.body.restitution = Math.random();
 
-        // Create Walls
-        for(y = 0; y < PROPERTIES.boardHeight; y++) {
-          renderer.stage.addChild(brick.create(0, y));
-          renderer.stage.addChild(brick.create(PROPERTIES.boardWidth-1, y));
-        }
+                            physics.add(pin.body);
+                        }
+                    }
+                },
 
-        for(x = 0; x < PROPERTIES.boardWidth; ++x) {
-          renderer.stage.addChild(brick.create(x, PROPERTIES.boardHeight-1));
-        }
+                createLeftWall : function (levelId) {
+                    var leftWall = new PIXI.Container();
+                    var baseY = levelId * (PROPERTIES.boardHeight - 3);
+                    for(var y = 0; y < PROPERTIES.boardHeight; y++) {
+                        physics.add(leftWall.addChild(brick.create(0, baseY + y)).body);
+                    }
+                    renderer.stage.addChild(leftWall);
+                    return leftWall;
+                },
 
-        physics.add(Matter.Bodies.rectangle(PROPERTIES.tileSize*0.5, (PROPERTIES.boardHeight*PROPERTIES.tileSize)/2, PROPERTIES.tileSize, PROPERTIES.boardHeight*PROPERTIES.tileSize, { isStatic: true }));
-        physics.add(Matter.Bodies.rectangle((PROPERTIES.boardWidth-0.5)*PROPERTIES.tileSize, (PROPERTIES.boardHeight*PROPERTIES.tileSize)/2, PROPERTIES.tileSize, PROPERTIES.boardHeight*PROPERTIES.tileSize, { isStatic: true }));
-        physics.add(Matter.Bodies.rectangle((PROPERTIES.boardWidth*0.5)*PROPERTIES.tileSize, (PROPERTIES.boardHeight - 0.5) * PROPERTIES.tileSize, PROPERTIES.boardWidth*PROPERTIES.tileSize, PROPERTIES.tileSize, { isStatic: true }));
+                createRightWall : function (levelId) {
+                    var rightWall = new PIXI.Container();
+                    var baseY = levelId * (PROPERTIES.boardHeight - 3);
+                    for(var y = 0; y < PROPERTIES.boardHeight; y++) {
+                        physics.add(rightWall.addChild(brick.create(PROPERTIES.boardWidth-1, baseY + y)).body);
+                    }
+                    renderer.stage.addChild(rightWall);
+                    return rightWall;
+                },
 
-        // Create Pins
-        for(y = 0; y < 5; y++) {
-          for(x = 0; x < ((y%2)?8:9); x++) {
-            var pin = new Pin(sprite.board.pin);
-            pin.x = 56 + 12 + x * 2 * 48 + ((y%2)?96:48);
-            pin.y = 128 + 12 + y * 1.732 * 48;
-            renderer.stage.addChild(pin);
+                createTraps : function (levelId, hasDeathZone) {
+                    for(var i = 0; i < hasDeathZone.length; ++i) {
+                        var baseY = levelId * (PROPERTIES.boardHeight - 3);
 
-            Matter.Body.setPosition(pin.body, { x: pin.x, y: pin.y })
-            pin.body.restitution = Math.random();
+                        if (i > 0) {
+                            physics.add(renderer.stage.addChild(pointFactory.create(i * 3 + 0.5, baseY + 1)).body);
+                            renderer.stage.addChild(brick.create(i * 3, baseY + 1));
+                            renderer.stage.addChild(brick.create(i * 3, baseY + 2));
+                        }
 
-            physics.add(pin.body);
-          }
-        }
-      },
+                        if(hasDeathZone[i]) {
+                            physics.add(renderer.stage.addChild(lavaFactory.create(i * 3 + 1, baseY + 0)).body);
 
-    start : function () {
-      $timeout(() => {
-      while(trapdoors.length > 0) {
-          renderer.stage.removeChild(trapdoors[0]);
-          physics.remove(trapdoors[0].body);
-          trapdoors.shift();
-      }}, 600);
-    }
-  };
-}]);
+                            var floor = brick.create(i * 3 + 1,baseY + 2);
+                            renderer.stage.addChild(floor);
+                            physics.add(floor.body);
+
+                            floor = brick.create(i * 3 + 2, baseY + 2);
+                            renderer.stage.addChild(floor);
+                            physics.add(floor.body);
+                        } else {
+                            var trapdoor = trapdoorFactory.create(i * 3 + 1, baseY + 2);
+                            renderer.stage.addChild(trapdoor);
+                            physics.add(trapdoor.body);
+                            trapdoors[levelId] = trapdoors[levelId] || [];
+                            trapdoors[levelId].push(trapdoor);
+
+                            trapdoor = trapdoorFactory.create(i * 3 + 2, baseY + 2);
+                            renderer.stage.addChild(trapdoor);
+                            physics.add(trapdoor.body);
+                            trapdoors[levelId].push(trapdoor);
+                        }
+                    }
+                },
+
+                start : function () {
+                    $timeout(() => {
+                        while(trapdoors[currentLevel].length > 0) {
+                        renderer.stage.removeChild(trapdoors[currentLevel][0]);
+                        physics.remove(trapdoors[currentLevel][0].body);
+                        trapdoors[currentLevel].shift();
+                    }}, 600);
+                }
+            };
+        }]);

@@ -12,17 +12,17 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
     // http://electron.atom.io/docs/latest/api/browser-window/#new-browserwindow-options
     mainWindow = new BrowserWindow({
-        name: 'Plinko',
-        width: 1280,
-        height: 720,
-        toolbar: false,
-        resizable: false,
-        fullscreen: true
-    });
+    name: 'Plinko',
+    width: 1280,
+    height: 720,
+    toolbar: false,
+    resizable: false,
+    fullscreen: true
+});
 
-    mainWindow.loadURL(path.join('file://', __dirname, '/app/index.html'));
+mainWindow.loadURL(path.join('file://', __dirname, '/app/index.html'));
 
-    mainWindow.on('closed', () => {
-        mainWindow = null;
-    });
+mainWindow.on('closed', () => {
+    mainWindow = null;
+});
 });
